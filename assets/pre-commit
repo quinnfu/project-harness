@@ -1,0 +1,12 @@
+#!/bin/sh
+# Harness check (project-harness). Enable once per clone: git config core.hooksPath .githooks
+for py in python3 python py; do
+  if command -v "$py" >/dev/null 2>&1 && "$py" -c "import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)" >/dev/null 2>&1; then
+    exec "$py" harness/check.py --staged
+  fi
+done
+if command -v uv >/dev/null 2>&1; then
+  exec uv run --no-project python harness/check.py --staged
+fi
+echo "harness: Python 3.8+ not found, skipping harness check (install Python or uv)" >&2
+exit 0
