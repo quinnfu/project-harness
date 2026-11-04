@@ -4,6 +4,7 @@ The GOOD_* fixtures are deliberately in Chinese to cover the parser's Chinese-ke
 t_templates_pass covers the shipped English templates.
 """
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -14,12 +15,14 @@ HERE = Path(__file__).resolve().parent
 CHECK = HERE.parent / "scripts" / "check.py"
 ASSETS = HERE.parent / "assets"
 PY = sys.executable
+# Drop GIT_* vars (set when running inside a git hook) so temp repos never touch the outer repository.
+ENV = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
 failures = []
 
 
 def sh(root, *args):
     return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=root,
-                          capture_output=True, text=True, encoding="utf-8")
+                          capture_output=True, text=True, encoding="utf-8", env=ENV)
 
 
 def write(root, rel, text):
@@ -29,7 +32,8 @@ def write(root, rel, text):
 
 
 def run(root, *flags):
-    r = subprocess.run([PY, str(CHECK), "--json", *flags], cwd=root, capture_output=True, text=True, encoding="utf-8")
+    r = subprocess.run([PY, str(CHECK), "--json", *flags], cwd=root, capture_output=True, text=True, encoding="utf-8",
+                       env=ENV)
     try:
         data = json.loads(r.stdout)
     except json.JSONDecodeError:

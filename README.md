@@ -48,11 +48,16 @@ CHANGELOG.md      history of the standard version and the check version
 
 ## Development
 
-After making changes, run from the repository root (requires git):
+After cloning, enable the dev hooks once:
 
 ```sh
-python tests/run_tests.py
+git config core.hooksPath .githooks
 ```
+
+- `pre-commit` runs the regression tests (`python tests/run_tests.py`, requires git) when `scripts/`, `tests/` or `assets/` change, and blocks the commit if they fail.
+- `post-commit` pushes every commit on `main` to `origin`.
+
+These hooks are for developing this skill only; the hook installed into projects is [assets/pre-commit](assets/pre-commit).
 
 See [CHANGELOG.md](CHANGELOG.md) for versioning rules and migration notes. When you change `check.py`, bump its `VERSION` and keep [references/checks.md](references/checks.md) in sync.
 

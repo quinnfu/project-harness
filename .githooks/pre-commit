@@ -1,0 +1,23 @@
+#!/bin/sh
+# Dev hook for this skill repo: run the regression tests when code, tests or templates change.
+git diff --cached --name-only | grep -qE '^(scripts|tests|assets)/' || exit 0
+
+run_py() {
+  for py in python3 python py; do
+    if command -v "$py" >/dev/null 2>&1 && "$py" -c "import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)" >/dev/null 2>&1; then
+      "$py" "$@"; return
+    fi
+  done
+  if command -v uv >/dev/null 2>&1; then
+    uv run --no-project python "$@"; return
+  fi
+  echo "pre-commit: Python 3.8+ not found; cannot run tests (bypass with git commit --no-verify)" >&2
+  return 1
+}
+
+if ! out=$(run_py tests/run_tests.py 2>&1); then
+  echo "$out"
+  echo "pre-commit: regression tests failed, commit blocked" >&2
+  exit 1
+fi
+echo "pre-commit: regression tests passed"
