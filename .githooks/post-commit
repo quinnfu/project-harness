@@ -1,5 +1,4 @@
 #!/bin/sh
-# Dev hook for this skill repo: push every commit on main to origin.
+# Dev hook for this skill repo: push the current branch to origin after every commit.
 branch=$(git symbolic-ref --short -q HEAD) || exit 0
-[ "$branch" = "main" ] || exit 0
-git push --quiet origin main || echo "post-commit: push failed; run 'git push' manually" >&2
+git push --quiet -u origin "$branch" || echo "post-commit: push failed; run 'git push -u origin $branch' manually" >&2

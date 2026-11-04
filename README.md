@@ -44,6 +44,8 @@ assets/           AGENTS.md and profile templates, pre-commit hook
 scripts/check.py  computational checks (vendored into projects)
 tests/            scenario regression tests for check.py
 CHANGELOG.md      history of the standard version and the check version
+AGENTS.md         how agents develop this repository (change workflow)
+.githooks/        dev hooks for this repository
 ```
 
 ## Development
@@ -55,9 +57,11 @@ git config core.hooksPath .githooks
 ```
 
 - `pre-commit` runs the regression tests (`python tests/run_tests.py`, requires git) when `scripts/`, `tests/` or `assets/` change, and blocks the commit if they fail.
-- `post-commit` pushes every commit on `main` to `origin`.
+- `post-commit` pushes the current branch to `origin`.
 
 These hooks are for developing this skill only; the hook installed into projects is [assets/pre-commit](assets/pre-commit).
+
+Changes go through pull requests. To have an agent make a change, open a chat in this repository and describe it; the agent follows the change workflow in [AGENTS.md](AGENTS.md): branch → edit → test → review → push → open a PR for you to merge.
 
 See [CHANGELOG.md](CHANGELOG.md) for versioning rules and migration notes. When you change `check.py`, bump its `VERSION` and keep [references/checks.md](references/checks.md) in sync.
 
